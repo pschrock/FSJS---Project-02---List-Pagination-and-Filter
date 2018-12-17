@@ -16,23 +16,24 @@ FSJS project 2 - List Filter and Pagination
    will only be used inside of a function, then it can be locally
    scoped to that function.
 ***/
-const page = document.querySelector('.page');
 const studentList = document.getElementsByTagName('ul')[0];
 const list = [];
 const students = document.querySelectorAll('.student-item');
-for (let i = 0; i <= students.length; i += 1) {
-  let student_avatar = students[i].querySelector('.avatar').attributes[1].value;
-  let student_name = students[i].querySelector('h3').innerText;
-  let student_email = students[i].querySelector('.email').innerText;
-  let student_joined = students[i].querySelector('.joined-details').innerText.split(' ')[1];
-  let student = {
+
+// find all students on the page and save data into array
+students.forEach(student => {
+  const student_avatar = student.querySelector('.avatar').attributes[1].value;
+  const student_name = student.querySelector('h3').innerText;
+  const student_email = student.querySelector('.email').innerText;
+  const student_joined = student.querySelector('.joined-details').innerText.split(' ')[1];
+  const studentInfo = {
     avatar: student_avatar,
     name: student_name,
     email: student_email,
     joined: student_joined
   };
-  list.push(student);
-}
+  list.push(studentInfo);
+});
 
 /***
    Create the `showPage` function to hide all of the items in the
@@ -48,22 +49,80 @@ for (let i = 0; i <= students.length; i += 1) {
        that will be passed into the parens later when you call or
        "invoke" the function
 ***/
-const showPage = (list, pages) => {
-
-}
 
 
+const showPage = (list, page) => {
+  // find in list array of students needed to be shown on the page
+  const greatest = page * 10;
+  const least = greatest - 10;
+  const newList = list.slice(least, greatest);
+
+  //format list for new page list
+  let studentPageList = '';
+  newList.forEach(student => {
+    studentPageList += `
+      <li class="student-item cf">
+        <div class="student-details">
+          <img class="avatar" src="${student.avatar}">
+          <h3>${student.name}</h3>
+          <span class="email">${student.email}</span>
+        </div>
+        <div class="joined-details">
+          <span class="date">Joined ${student.joined}</span>
+        </div>
+      </li>
+    `;
+  });
+
+  studentList.innerHTML = studentPageList;
+};
+
+showPage(list, 1);
 
 /***
    Create the `appendPageLinks function` to generate, append, and add
    functionality to the pagination buttons.
 ***/
 
-const appendPageLinks = list => {
-  
-  page.appendChild();
+function appendPageLinks(list) {
+  const pageDiv = studentList.parentNode;
+
+  //calculate number of buttons(pages) needed
+  let totalPages = 1;
+  if(list.length % 10 > 0) {
+    totalPages = Math.round(list.length / 10) + 1;
+  } else {
+    totalPages = Math.round(list.length / 10)
+  };
+
+  //create list of button numbers
+  let div = document.createElement('div');//'<div class="pagination"><ul>';
+  div.classList.add("pagination");
+
+  let paginationButtons = '<ul>'
+  for (let i = 5; i >= 0; i -= 1){
+    let pageNumber = totalPages - i;
+    paginationButtons += `
+      <li>
+        <a href="#${pageNumber.toString()}">${pageNumber.toString()}</a>
+      </li>
+    `;
+  };
+  paginationButtons += '</ul>';
+  div.innerHTML = paginationButtons;
+
+  pageDiv.appendChild(div);
+
+  const pageButtonsList = document.querySelector('.pagination');
+  let selection = 1;
+  pageButtonsList.addEventListener('click', (e) => {
+    if(e.target.tagName === 'A') {
+      selection = parseInt(e.target.innerText, 10);
+    }
+    showPage(list, selection);
+  });
 }
 
-
+appendPageLinks(list);
 
 // Remember to delete the comments that came with this file, and replace them with your own code comments.
