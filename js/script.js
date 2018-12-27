@@ -104,20 +104,31 @@ const showPage = (list, page) => {
 
   //format array list for new page list
   let studentPageList = '';
-  newList.forEach(student => {
+  if(list.length > 0) {
+    newList.forEach(student => {
+      studentPageList += `
+        <li class="student-item cf">
+          <div class="student-details">
+            <img class="avatar" src="${student.avatar}">
+            <h3>${student.name}</h3>
+            <span class="email">${student.email}</span>
+          </div>
+          <div class="joined-details">
+            <span class="date">Joined ${student.joined}</span>
+          </div>
+        </li>
+      `;
+    });
+  }else{
     studentPageList += `
       <li class="student-item cf">
         <div class="student-details">
-          <img class="avatar" src="${student.avatar}">
-          <h3>${student.name}</h3>
-          <span class="email">${student.email}</span>
-        </div>
-        <div class="joined-details">
-          <span class="date">Joined ${student.joined}</span>
+          <h3>No Student Found</h3>
+          <span class="email">Please select another student name or student email</span>
         </div>
       </li>
-    `;
-  });
+    `
+  }
   ulList.innerHTML = studentPageList;
 };
 showPage(studentList, 1);
