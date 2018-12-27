@@ -7,6 +7,10 @@ FSJS project 2 - List Filter and Pagination
 const ulList = document.getElementsByTagName('ul')[0];
 const students = document.querySelectorAll('.student-item');
 
+
+
+
+
 //array saved in const studentList
 const createStudentList = () => {
   const list = [];
@@ -25,7 +29,11 @@ const createStudentList = () => {
   });
   return list;
 }
-const createdList = createStudentList();
+const studentList = createStudentList();
+
+
+
+
 
 //add search input and button
 const addSearchField = () => {
@@ -42,33 +50,50 @@ const addSearchField = () => {
 //add search field
 addSearchField();
 
+
+
+
+
 // get search input to evaluate list of students
-// const evaluateSearch = list => {
-//   let searchList = [];
-//   let searchInput = '';
-//
-//   list.forEach(student => {
-//     let name = student.name.toLowerCase();
-//     let email = student.email.toLowerCase();
-//
-//     const div = document.querySelector('.student-search');
-//     div.addEventListener('keyup', (e) => {
-//       if(e.target.tagName === 'INPUT') {
-//         searchInput = e.target.value.toLowerCase();
-//       }
-//     });
-//     div.addEventListener('click', (e) => {
-//       if(e.target.tagName === 'BUTTON') {
-//         searchInput = e.target.previousElementSibling.value.toLowerCase();
-//       }
-//     });
-//
-//     if(name.indexOf(searchInput) >= 0 || email.indexOf(searchInput) >= 0) {
-//       searchList.push(student);
-//     }
-//   });
-// };
-// const evaluatedList = evaluateSearch(createdList);
+const div = document.querySelector('.student-search');
+
+div.addEventListener('keyup', (e) => {
+  if(e.target.tagName === 'INPUT') {
+    let searchList = [];
+    searchInput = e.target.value.toLowerCase();
+    studentList.filter(student => {
+      let name = student.name.toLowerCase();
+      let email = student.email.toLowerCase();
+
+      if(name.indexOf(searchInput) >= 0 || email.indexOf(searchInput) >= 0) {
+        searchList.push(student);
+      }
+    });
+    showPage(searchList, 1);
+    appendPageLinks(searchList);
+  }
+});
+
+
+div.addEventListener('click', (e) => {
+  if(e.target.tagName === 'BUTTON') {
+    let searchList = [];
+    searchInput = e.target.previousElementSibling.value.toLowerCase();
+    studentList.filter(student => {
+      let name = student.name.toLowerCase();
+      let email = student.email.toLowerCase();
+
+      if(name.indexOf(searchInput) >= 0 || email.indexOf(searchInput) >= 0) {
+        searchList.push(student);
+      }
+    });
+    showPage(searchList, 1);
+    appendPageLinks(searchList);
+  }
+});
+
+
+
 
 //showPage function
 const showPage = (list, page) => {
@@ -95,37 +120,44 @@ const showPage = (list, page) => {
   });
   ulList.innerHTML = studentPageList;
 };
-showPage(createdList, 1);
+showPage(studentList, 1);
+
+
+
+
+
+//create list of button numbers
+const pageDiv = ulList.parentNode;
+const buttonDiv = document.createElement('div');
+buttonDiv.classList.add("pagination");
+pageDiv.appendChild(buttonDiv);
 
 //appendPageLinks function
-const pageDiv = ulList.parentNode;
 const appendPageLinks = list => {
-  //create list of button numbers
-  let buttonDiv = document.createElement('div');
-  buttonDiv.classList.add("pagination");
 
   //calculate number of buttons(pages) needed
-  let pages = 1;
-  let arrayTotal = list.length;
-  if(arrayTotal % 10 > 0) {
-    pages = Math.round(arrayTotal / 10) + 1;
-  } else {
-    pages = Math.round(arrayTotal / 10)
-  }
+  let pages = Math.ceil(list.length / 10);
 
   //create button format
   let paginationButtons = '<ul>';
-  for (let i = 5; i >= 0; i -= 1){
-    let totalNumber = pages - i;
-    paginationButtons += `
-      <li>
-        <a href="#${totalNumber.toString()}">${totalNumber.toString()}</a>
-      </li>
-    `;
+  for (let i = 1; i <= pages; i += 1){
+    // let totalNumber = pages - i;
+    if(i === 1) {
+      paginationButtons = `
+        <li>
+          <a class="active" href="#${i.toString()}">${i.toString()}</a>
+        </li>
+      `;
+    }else{
+      paginationButtons += `
+        <li>
+          <a href="#${i.toString()}">${i.toString()}</a>
+        </li>
+      `;
+    }
   };
   paginationButtons += '</ul>';
   buttonDiv.innerHTML = paginationButtons;
-  pageDiv.appendChild(buttonDiv);
 
   //listening for clicked events to post page number
   const pageButtonsList = document.querySelector('.pagination');
@@ -141,5 +173,4 @@ const appendPageLinks = list => {
     }
   });
 }
-
-appendPageLinks(createdList);
+appendPageLinks(studentList);
